@@ -1,0 +1,6 @@
+@SteletusApplicationPresentation_HostAddress = http://localhost:5188
+
+GET {{SteletusApplicationPresentation_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

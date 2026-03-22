@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="SteletusApplication/SteletusApplicationPresentation.csproj" />
+  <Project Path="SteletusApplicationCore/SteletusApplicationCore.csproj" />
+  <Project Path="SteletusApplicationDataAccess/SteletusApplicationDataAccess.csproj" />
+  <Project Path="SteletusApplicationLogic/SteletusApplicationLogic.csproj" />
+</Solution>
