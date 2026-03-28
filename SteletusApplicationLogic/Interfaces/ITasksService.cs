@@ -13,5 +13,6 @@ namespace SteletusApplicationLogic.Interfaces
         Task<SteletusApplicationCore.Models.Task?> GetTaskById(Guid taskId);
 
         Task<int> UpdateTask(SteletusApplicationCore.Models.Task task);
+        Task<int> DeleteTaskById(Guid id);
     }
 }

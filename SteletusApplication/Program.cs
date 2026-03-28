@@ -2,10 +2,21 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using SteletusApplicationPresentation.AuthorizationPolicies;
 using SteletusApplicationPresentation.Middlewares;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.Configure<SteletusApplicationPresentation.Settings.JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+
+builder.Services.AddDbContext<SteletusApplicationDataAccess.Models.SteletusApplicationDataAccessContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<SteletusApplicationLogic.IRepositories.ITasksRepository, SteletusApplicationDataAccess.Repositories.TasksRepository>();
+builder.Services.AddScoped<SteletusApplicationLogic.Interfaces.ITasksService, SteletusApplicationLogic.Services.TasksService>();
+
+builder.Services.AddScoped<SteletusApplicationLogic.IRepositories.IBuildRepository, SteletusApplicationDataAccess.Repositories.BuildRepository>();
+builder.Services.AddScoped<SteletusApplicationLogic.Interfaces.IBuildService, SteletusApplicationLogic.Services.BuildsService>();
+
 builder.Services.AddTransient<SteletusApplicationPresentation.Middlewares.ExceptionHandlingMiddleware>();
 
 var authenticationBuilder = builder.Services.AddAuthentication(options =>
@@ -77,10 +88,11 @@ app.UseAuthorization();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 
-var apiGroup = app.MapGroup("/api");
+var apiGroup = app.MapGroup("/app/api");
 apiGroup.AddEndpointFilter<SingleFlightSameResponseFilter>();
 
 SteletusApplicationPresentation.APIs.Tasks.Map(apiGroup);
+SteletusApplicationPresentation.APIs.Builds.Map(apiGroup);
 
 
 app.Run();

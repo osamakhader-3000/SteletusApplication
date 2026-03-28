@@ -9,6 +9,10 @@ namespace SteletusApplicationDataAccess.Models
     {
         public virtual DbSet<SteletusApplicationDataAccess.Models.Task> Tasks { get; set; }
 
+        public virtual DbSet<SteletusApplicationDataAccess.Models.Build> Builds { get; set; }
+
+        public virtual DbSet<SteletusApplicationDataAccess.Models.BuildClient> BuildClients { get; set; }
+
 
         public SteletusApplicationDataAccessContext(DbContextOptions<SteletusApplicationDataAccessContext> options)
         : base(options)
@@ -19,6 +23,12 @@ namespace SteletusApplicationDataAccess.Models
         {            
            
             OnModelCreatingPartial(modelBuilder);
+
+
+            modelBuilder.Entity<BuildClient>()
+               .HasOne(bc => bc.Build)
+               .WithMany(b => b.Clients)
+               .HasForeignKey(bc => bc.BuildId);
         }
 
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);

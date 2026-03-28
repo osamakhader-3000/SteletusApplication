@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SteletusApplicationCore\SteletusApplicationCore.csproj" />
+    <ProjectReference Include="..\SteletusApplicationDataAccess\SteletusApplicationDataAccess.csproj" />
     <ProjectReference Include="..\SteletusApplicationLogic\SteletusApplicationLogic.csproj" />
   </ItemGroup>
 

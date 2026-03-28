@@ -20,6 +20,12 @@ namespace SteletusApplicationLogic.Services
             return result;
         }
 
+        public async Task<int> DeleteTaskById(Guid id)
+        {
+            int result = await _tasksRepository.DeleteTaskById(id);
+            return result;
+        }
+
         public async Task<SteletusApplicationCore.Models.Task?> GetTaskById(Guid taskId)
         {
             var result = await _tasksRepository.GetTaskById(taskId);

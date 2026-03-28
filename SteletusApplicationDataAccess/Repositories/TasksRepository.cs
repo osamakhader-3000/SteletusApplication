@@ -2,9 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using SteletusApplicationDataAccess.Mappers;
 using SteletusApplicationLogic.IRepositories;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using SteletusApplicationDataAccess.Models;
 
 namespace SteletusApplicationDataAccess.Repositories
 {
@@ -33,6 +31,11 @@ namespace SteletusApplicationDataAccess.Repositories
             return entriesNumber;
         }
 
+        public async Task<int> DeleteTaskById(Guid id)
+        {          
+            int result = await _context.Tasks.Where(t => t.Id == id).ExecuteDeleteAsync();
+            return result;
+        }
 
         public async Task<SteletusApplicationCore.Models.Task?> GetTaskById(Guid taskId)
         {

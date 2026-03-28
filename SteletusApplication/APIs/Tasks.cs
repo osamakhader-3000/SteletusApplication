@@ -15,9 +15,38 @@ namespace SteletusApplicationPresentation.APIs
             taskGroup.MapGet("/get/{id}", GetTask);
             taskGroup.MapPost("/create", CreateTask);
             taskGroup.MapPut("/update", UpdateTask);
+            taskGroup.MapDelete("/delete/{id}", DeleteTask);
 
             RouteGroupBuilder adminTaskGroup = taskGroup.MapGroup("/admin").RequireAuthorization("AdminLevel");
             adminTaskGroup.MapGet("/list", ListTasks);
+        }
+
+        private static async Task<Results<Ok,NotFound, UnauthorizedHttpResult, InternalServerError<string>>> DeleteTask(HttpContext context, ITasksService tasksService, Guid id)
+        {
+
+            string? userIdClaim = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return TypedResults.Unauthorized();
+            }
+
+            Guid userId = Guid.Parse(userIdClaim);
+
+            SteletusApplicationCore.Models.Task? task = await tasksService.GetTaskById(id);
+
+            if(task == null)
+                return TypedResults.NotFound();
+
+            if(task.AssignedBy != userId)
+                return TypedResults.Unauthorized();
+
+            int result = await tasksService.DeleteTaskById(id);
+
+            if(result == 0)
+                return TypedResults.InternalServerError("Task deletion failed");
+
+            return TypedResults.Ok();
+
         }
 
         private static async Task<Results<Ok, UnauthorizedHttpResult, InternalServerError<string>>> CreateTask(HttpContext context, ITasksService tasksService, [FromBody] SteletusApplicationPresentation.DataTransferObjects.Task task)
