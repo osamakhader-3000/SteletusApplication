@@ -10,7 +10,7 @@ namespace SteletusApplicationPresentation.APIs
     {
         public static void Map(RouteGroupBuilder apiGroup)
         {
-            RouteGroupBuilder buildGroup = apiGroup.MapGroup("/builds").RequireAuthorization("VerifiedEmail", "ActiveAccount");
+            RouteGroupBuilder buildGroup = apiGroup.MapGroup("/builds").RequireAuthorization("VerifiedEmail", "ActiveAccount","TechnicalSupportLevel");
             buildGroup.MapGet("/list", ListBuilds);
             buildGroup.MapGet("/get/{id}", GetBuild);
             buildGroup.MapPost("/create", CreateBuild);

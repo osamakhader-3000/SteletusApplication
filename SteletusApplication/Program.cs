@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using SteletusApplicationPresentation.AuthorizationPolicies;
 using SteletusApplicationPresentation.Middlewares;
-using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -59,6 +59,13 @@ builder.Services.AddAuthorization(options =>
         policy.AddRequirements(new AdminLevelRequirement());
 
     });
+
+    options.AddPolicy("TechnicalSupportLevel", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.AddRequirements(new TechnicalSupportLevelRequirement());
+    });
+
 });
 
 

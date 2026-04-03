@@ -6,9 +6,9 @@ namespace SteletusApplicationPresentation.AuthorizationPolicies
     {
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, AdminLevelRequirement requirement)
         {
-            var claim = context.User.FindFirst(nameof(SteletusApplicationCore.Models.User.SecurityLevel));
+            var claim = context.User.FindFirst(nameof(SteletusApplicationCore.Models.UserRole));
 
-            if (claim != null && byte.TryParse(claim.Value, out byte result) && result > 1)
+            if (claim != null && claim.Value == ((byte)SteletusApplicationCore.Models.UserRole.Administrator).ToString())
             {
                 context.Succeed(requirement);
             }

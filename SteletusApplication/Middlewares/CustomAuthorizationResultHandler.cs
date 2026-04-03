@@ -38,6 +38,15 @@ namespace SteletusApplicationPresentation.Middlewares
                 return;
             }
 
+            if (authorizeResult.Forbidden && authorizeResult.AuthorizationFailure?.FailedRequirements.OfType<TechnicalSupportLevelRequirement>().Any() == true)
+            {
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                context.Response.ContentType = "application/json";
+
+                await context.Response.WriteAsync("{\"error\": \"technical_support_level_required\"}");
+                return;
+            }
+
 
             await _defaultHandler.HandleAsync(next, context, policy, authorizeResult);
         }

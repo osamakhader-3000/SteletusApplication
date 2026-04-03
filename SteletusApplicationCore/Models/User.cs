@@ -1,6 +1,6 @@
 ﻿namespace SteletusApplicationCore.Models
 {
-    public class User(Guid id, string? username, string email, string? password,UserAccountStatus accountStatus, UserEmailVerificationStatus emailVerificationStatus,byte securityLevel,bool localAccount)
+    public class User(Guid id, string? username, string email, string? password,UserAccountStatus accountStatus, UserEmailVerificationStatus emailVerificationStatus, UserRole role,bool localAccount)
     {
         public Guid Id { get; private set; } = id;
         public string? Username { get; private set; } = username;
@@ -11,7 +11,7 @@
 
         public UserEmailVerificationStatus EmailVerificationStatus { get; private set; } = emailVerificationStatus;
 
-        public byte SecurityLevel { get; private set; } = securityLevel;
+        public UserRole Role { get; private set; } = role;
 
 
         public bool LocalAccount { get; private set; } = localAccount;
@@ -31,6 +31,13 @@
     {
         Unverified,
         Verified
+    }
+
+    public enum UserRole
+    {
+        Employee = 1,
+        TechnicalSupport = 2,
+        Administrator = 3
     }
 
 
