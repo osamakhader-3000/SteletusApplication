@@ -10,12 +10,12 @@ namespace SteletusApplicationPresentation.APIs
     {
         public static void Map(RouteGroupBuilder apiGroup)
         {
-            RouteGroupBuilder buildGroup = apiGroup.MapGroup("/builds").RequireAuthorization("VerifiedEmail", "ActiveAccount","TechnicalSupportLevel");
+            RouteGroupBuilder buildGroup = apiGroup.MapGroup("/builds").RequireAuthorization("VerifiedEmail", "ActiveAccount");
             buildGroup.MapGet("/list", ListBuilds);
-            buildGroup.MapGet("/get/{id}", GetBuild);
-            buildGroup.MapPost("/create", CreateBuild);
-            buildGroup.MapPut("/update", UpdateBuild);
-            buildGroup.MapDelete("/delete/{id}", DeleteBuild);
+            buildGroup.MapGet("/get/{id}", GetBuild).RequireAuthorization("TechnicalSupportLevel");
+            buildGroup.MapPost("/create", CreateBuild).RequireAuthorization("TechnicalSupportLevel");
+            buildGroup.MapPut("/update", UpdateBuild).RequireAuthorization("TechnicalSupportLevel"); ;
+            buildGroup.MapDelete("/delete/{id}", DeleteBuild).RequireAuthorization("TechnicalSupportLevel");
         }
 
         private static async Task<Ok<List<Build>>> ListBuilds(IBuildService buildService)
