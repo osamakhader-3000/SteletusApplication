@@ -76,6 +76,7 @@ builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<IAuthorizationHandler, EmailVerifiedHandler>();
 builder.Services.AddSingleton<IAuthorizationHandler, ActiveAccountHandler>();
 builder.Services.AddSingleton<IAuthorizationHandler, AdminLevelRequirementHandler>();
+builder.Services.AddSingleton<IAuthorizationHandler, TechnicalSupportLevelRequirementHandler>();
 
 builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, CustomAuthorizationResultHandler>();
 
