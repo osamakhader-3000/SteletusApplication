@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using SteletusApplicationPresentation.AuthorizationPolicies;
 using SteletusApplicationPresentation.Middlewares;
@@ -80,6 +81,11 @@ builder.Services.AddSingleton<IAuthorizationHandler, TechnicalSupportLevelRequir
 
 builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, CustomAuthorizationResultHandler>();
 
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost;
+});
+
 var app = builder.Build();
 
 
@@ -95,8 +101,9 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
+app.UseForwardedHeaders();
 
-var apiGroup = app.MapGroup("/app/api");
+var apiGroup = app.MapGroup("/api");
 apiGroup.AddEndpointFilter<SingleFlightSameResponseFilter>();
 
 SteletusApplicationPresentation.APIs.Tasks.Map(apiGroup);
