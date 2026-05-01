@@ -8,25 +8,27 @@ namespace SteletusApplicationDataAccess.Mappers
     {
         public static SteletusApplicationCore.Models.Build ToCoreModel(this Models.Build build)
         {
-            return new SteletusApplicationCore.Models.Build(build.Id, build.BuildVersion??string.Empty, build.Link, build.Clients?.Select(c=>c.ClientName).ToList());
+            return new SteletusApplicationCore.Models.Build(build.Id, build.BuildVersion??string.Empty, build.Link, build.Clients?.ToCoreModelList(), build.BuildLogs?.ToCoreModels());
         }
 
         public static Models.Build ToDataModel(this SteletusApplicationCore.Models.Build build)
         {
             Models.Build bld = new() { Id = build.Id, BuildVersion = build.Version, Link = build.Link };
 
-            List<Models.BuildClient> buildClients = new List<Models.BuildClient>();
+            List<Models.Client> buildClients = new List<Models.Client>();
 
             if (build.Clients != null)
             {
 
-                foreach (string clientName in build.Clients)
+                foreach (SteletusApplicationCore.Models.Client client in build.Clients)
                 {
-                    Models.BuildClient buildClient = new Models.BuildClient
+                    Models.Client buildClient = new Models.Client
                     {
-                        BuildId = build.Id,
-                        ClientName = clientName,
-                        Build = bld
+                        Id = client.Id,
+                        CurrentChangeRequest = client.CurrentChangeRequest,
+                        LastChangeRequest = client.LastChangeRequest,
+                        Name = client.Name,
+                        Description= client.Description
                     };
                     buildClients.Add(buildClient);
                 }
@@ -42,9 +44,9 @@ namespace SteletusApplicationDataAccess.Mappers
             return builds.Select(b => b.ToCoreModel());
         }
 
-        public static IEnumerable<Models.Build> ToDataModelList(this IEnumerable<SteletusApplicationCore.Models.Build> buildDtos)
+        public static IEnumerable<Models.Build> ToDataModelList(this IEnumerable<SteletusApplicationCore.Models.Build> builds)
         {
-            return buildDtos.Select(b => b.ToDataModel());
+            return builds.Select(b => b.ToDataModel());
         }
 
     }

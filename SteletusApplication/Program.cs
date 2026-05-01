@@ -18,6 +18,9 @@ builder.Services.AddScoped<SteletusApplicationLogic.Interfaces.ITasksService, St
 builder.Services.AddScoped<SteletusApplicationLogic.IRepositories.IBuildRepository, SteletusApplicationDataAccess.Repositories.BuildRepository>();
 builder.Services.AddScoped<SteletusApplicationLogic.Interfaces.IBuildService, SteletusApplicationLogic.Services.BuildsService>();
 
+builder.Services.AddScoped<SteletusApplicationLogic.IRepositories.IClientRepository, SteletusApplicationDataAccess.Repositories.ClientRepository>();
+builder.Services.AddScoped<SteletusApplicationLogic.Interfaces.IClientService, SteletusApplicationLogic.Services.ClientsService>();
+
 builder.Services.AddTransient<SteletusApplicationPresentation.Middlewares.ExceptionHandlingMiddleware>();
 
 var authenticationBuilder = builder.Services.AddAuthentication(options =>
@@ -81,33 +84,38 @@ builder.Services.AddSingleton<IAuthorizationHandler, TechnicalSupportLevelRequir
 
 builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, CustomAuthorizationResultHandler>();
 
+/*
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost;
 });
+*/
 
 var app = builder.Build();
 
 
+app.UsePathBase("/steletusapp");
+app.UseHttpsRedirection();
 app.UseRouting();
+
 app.UseCookiePolicy(new CookiePolicyOptions
 {
     MinimumSameSitePolicy = SameSiteMode.None,
     Secure = CookieSecurePolicy.Always
 });
 
-app.UseHttpsRedirection();
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
-app.UseForwardedHeaders();
 
 var apiGroup = app.MapGroup("/api");
 apiGroup.AddEndpointFilter<SingleFlightSameResponseFilter>();
 
 SteletusApplicationPresentation.APIs.Tasks.Map(apiGroup);
 SteletusApplicationPresentation.APIs.Builds.Map(apiGroup);
+SteletusApplicationPresentation.APIs.Clients.Map(apiGroup);
 
 
 app.Run();

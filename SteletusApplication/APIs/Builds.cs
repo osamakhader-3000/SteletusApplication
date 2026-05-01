@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SteletusApplicationLogic.Interfaces;
 using SteletusApplicationPresentation.DataTransferObjects;
 using SteletusApplicationPresentation.Mappers;
+using System.Security.Claims;
 
 namespace SteletusApplicationPresentation.APIs
 {
@@ -32,25 +34,51 @@ namespace SteletusApplicationPresentation.APIs
             return TypedResults.Ok(result.ToDto());
         }
 
-        private static async Task<Results<Ok, InternalServerError<string>>> CreateBuild(IBuildService buildService, [FromBody] Build build)
+        private static async Task<Results<Ok, InternalServerError<string>>> CreateBuild(HttpContext httpContext, IBuildService buildService, [FromBody] Build build)
         {
+            string? userIdClaim = httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return TypedResults.InternalServerError("User ID claim not found");
+            }
+
+            Guid userId = Guid.Parse(userIdClaim);
+            build.UpdatedBy = userId;
             int result = await buildService.CreateBuild(build.ToDomain());
             if (result == 0)
                 return TypedResults.InternalServerError("Build creation failed");
             return TypedResults.Ok();
         }
 
-        private static async Task<Results<Ok, InternalServerError<string>>> UpdateBuild(IBuildService buildService, [FromBody] Build build)
+        private static async Task<Results<Ok, InternalServerError<string>>> UpdateBuild(HttpContext httpContext, IBuildService buildService, [FromBody] Build build)
         {
-            int result = await buildService.UpdateBuild(build.ToDomain());
-            if (result == 0)
-                return TypedResults.InternalServerError("Build update failed");
+            string? userIdClaim = httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return TypedResults.InternalServerError("User ID claim not found");
+            }
+
+            Guid userId = Guid.Parse(userIdClaim);
+            build.UpdatedBy = userId;
+
+            await buildService.UpdateBuild(build.ToDomain());
             return TypedResults.Ok();
         }
 
-        private static async Task<Results<Ok, NotFound, InternalServerError<string>>> DeleteBuild(IBuildService buildService, [FromRoute] Guid id)
-        {           
-            int result = await buildService.DeleteBuild(id);
+        private static async Task<Results<Ok, NotFound, InternalServerError<string>>> DeleteBuild(HttpContext httpContext,IBuildService buildService, [FromRoute] Guid id)
+        {
+            Build build = new() { Id = id };
+
+            string? userIdClaim = httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return TypedResults.InternalServerError("User ID claim not found");
+            }
+
+            Guid userId = Guid.Parse(userIdClaim);
+            build.UpdatedBy = userId;
+
+            int result = await buildService.DeleteBuild(build.ToDomain());
             if (result == 0)
                 return TypedResults.InternalServerError("Build deletion failed");
             return TypedResults.Ok();

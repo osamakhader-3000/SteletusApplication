@@ -73,25 +73,18 @@ namespace SteletusApplicationPresentation.APIs
 
         private static async Task<Results<Ok, UnauthorizedHttpResult, InternalServerError<string>>> UpdateTask(HttpContext context, ITasksService tasksService, [FromBody] SteletusApplicationPresentation.DataTransferObjects.Task task)
         {
-
             string? userIdClaim = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userIdClaim == null)
-            {
+            if (userIdClaim == null)            
                 return TypedResults.Unauthorized();
-            }
-
+            
             Guid userId = Guid.Parse(userIdClaim);
 
             task.AssignedTo = userId;
             task.AssignedBy = userId;
 
-            int result = await tasksService.UpdateTask(task.ToDomain());
-
-            if (result == 0)
-                return TypedResults.InternalServerError("Task update failed");
+            await tasksService.UpdateTask(task.ToDomain());
 
             return TypedResults.Ok();
-
         }
 
 

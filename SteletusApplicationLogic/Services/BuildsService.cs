@@ -20,14 +20,26 @@ namespace SteletusApplicationLogic.Services
 
         public async Task<int> CreateBuild(Build build)
         {
-            Build bld = new Build(Guid.NewGuid(), build.Version ?? string.Empty, build.Link, build.Clients);
+            Guid buildId = Guid.NewGuid();
+            BuildLog buildLog = new(0, buildId, DateTime.UtcNow, build.BuildLogs?.First().UserId ?? Guid.Empty);
+            Build bld = new(buildId, build.Version ?? string.Empty, build.Link, build.Clients,new List<BuildLog> { buildLog });
             int result = await _buildRepository.CreateBuild(bld);
             return result;
         }
 
-        public async Task<int> DeleteBuild(Guid buildId)
+        public async System.Threading.Tasks.Task UpdateBuild(Build build)
         {
-            int result = await _buildRepository.DeleteBuild(buildId);
+            BuildLog buildLog = new(0, build.Id, DateTime.UtcNow, build.BuildLogs?.First().UserId ?? Guid.Empty);
+            Build bld = new(build.Id, build.Version ?? string.Empty, build.Link, build.Clients, new List<BuildLog> { buildLog });
+            await _buildRepository.UpdateBuild(bld);
+        }
+
+
+        public async Task<int> DeleteBuild(Build build)
+        {
+            BuildLog buildLog = new(0, build.Id, DateTime.UtcNow, build.BuildLogs?.First().UserId ?? Guid.Empty);
+            Build bld = new(build.Id, string.Empty, string.Empty, [], new List<BuildLog> { buildLog });
+            int result = await _buildRepository.DeleteBuild(bld);
             return result;
         }
 
@@ -43,10 +55,5 @@ namespace SteletusApplicationLogic.Services
             return result;
         }
 
-        public async Task<int> UpdateBuild(Build build)
-        {
-            int result = await _buildRepository.UpdateBuild(build);
-            return result;
-        }
     }
 }
